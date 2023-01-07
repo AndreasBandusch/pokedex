@@ -1,11 +1,13 @@
 let allLoadedPokemons = [];
+let filteredPokemons = [];
+let noPokemonsFound = false;
 let swipePokemon;
-let offset = 1 ;
+let offset = 1;
 let limit = 20;
 const loadingStep = 20;
 
 
-window.addEventListener("resize", function() {
+window.addEventListener("resize", function () {
     let links = document.getElementById('links');
     let search = document.getElementById('search');
     let container = document.getElementById('responsive-bg');
@@ -32,19 +34,19 @@ async function loadPokemons() {
         let response = await fetch(url);
         currentPokemon = await response.json();
         allLoadedPokemons.push(currentPokemon);
-    }   
+    }
 }
 
 
 async function loadMore() {
-    offset = limit +1;
+    offset = limit + 1;
     if (limit > 898) {
         limit = 898;
         setLoadMoreButtonText(false);
     } else {
         setLoadMoreButtonText(true);
     }
-    limit = offset + (loadingStep -1);
+    limit = offset + (loadingStep - 1);
     await loadPokemons();
     renderPokemonCards();
 }
@@ -64,13 +66,16 @@ function setLoadMoreButtonText(value) {
 function renderPokemonCards() {
     let container = document.getElementById('card-container');
     container.innerHTML = '';
-    for (let i = 0; i < allLoadedPokemons.length; i++) {
-        let currentPokemon = allLoadedPokemons[i];
-        let cssStyle = getCssStyle(currentPokemon);
-        container.innerHTML += renderPokemonCardsHtmlTop(i, cssStyle, currentPokemon);
+    let renderArray;
+    if (filteredPokemons.length > 0 ? renderArray = filteredPokemons :  renderArray = allLoadedPokemons);  
+    if (!noPokemonsFound) {
+        for (let i = 0; i < renderArray.length; i++) {
+            let currentPokemon = renderArray[i];
+            let cssStyle = getCssStyle(currentPokemon);
+            container.innerHTML += renderPokemonCardsHtmlTop(i, cssStyle, currentPokemon);
+        }
+        container.innerHTML += renderPokemonCardsHtmlBottom();
     }
-    container.innerHTML += renderPokemonCardsHtmlBottom();
-   
 }
 
 
@@ -128,8 +133,8 @@ function switchPokemonCard(id, direction) {
         }
     } else {
         id--;
-        if (id  < 0) {
-            id = allLoadedPokemons.length -1;
+        if (id < 0) {
+            id = allLoadedPokemons.length - 1;
         }
     }
     let currentPokemon = allLoadedPokemons[id];
@@ -241,7 +246,7 @@ function renderBaseStats(currentPokemon, i) {
              <div class="progress">${getProgress(`${currentPokemon['stats'][i]['base_stat']}`, false)}</div>
             </div>
         </div>`;
-        return content;
+    return content;
 }
 
 
@@ -278,7 +283,7 @@ function getProgress(statValue, progressTotal) {
     } else {
         progressBg = 'progress-normal';
     }
-    let content =  `<div class="${progressBg}" style="width: ${statValue}%">&nbsp;</div>`;
+    let content = `<div class="${progressBg}" style="width: ${statValue}%">&nbsp;</div>`;
     return content;
 }
 
@@ -299,8 +304,8 @@ function openResponsiveMenu() {
     let search = document.getElementById('search');
     let container = document.getElementById('responsive-bg');
     if (links.style.display === 'block') {
-       closeResposiveMenu(links, search, container);
-    } else  {
+        closeResposiveMenu(links, search, container);
+    } else {
         showResponsiveMenu(links, search, container);
     }
 }
@@ -327,5 +332,16 @@ function showResponsiveMenu(links, search, container) {
 
 
 function searchPokemons() {
-    alert("Funktion befindet sich noch in der Entwicklung!");
+    let searchValue = document.getElementById('search-value').value.toLowerCase();
+    allLoadedPokemons.forEach((pokemon) => {
+        if (pokemon.name.startsWith(searchValue)) {
+            filteredPokemons.push(pokemon);
+            noPokemonsFound = false;
+        }
+    })
+    if (filteredPokemons.length < 1) {
+        noPokemonsFound = true;
+    }
+    renderPokemonCards();
+    filteredPokemons = [];
 }
