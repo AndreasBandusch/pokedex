@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-touch-icon-180x180.png">
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon/favicon-32x32.ico">
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon/favicon-96x96.png">
+    <meta name="msapplication-square310x310logo" content="images/favicon//mstile-310x310.png">
+    <meta name="msapplication-TileColor" content="#fff">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <title>Pokedex</title>
+</head>
+
+<body onload="init()">
+    <div id="header">
+        <div id="title" onclick="renderPokemonCards()">
+            <img id="pokeball" src="images/pokeball.png">
+            <h1>Pokedex</h1>
+        </div>
+        <div id="search" class="search">
+            <input onclick="searchPokemons()" id="search-value" type="text" placeholder="Suche...">
+        </div>
+        <div id="links" class="links">
+            <a href="#">Impressum</a> |
+            <a href="#">Datenschutz</a>
+        </div>
+        <img onclick="openResponsiveMenu()" id="menue-image" class="d-none" src="images/menu.png">
+        <div id="responsive-bg" style="display: none"></div>
+    </div>
+    <div id="card-container">
+        <div id="loading-screen" class="loading">Loading Pokemons...</div>
+    </div>
+    <div onclick="closeDetailsCard()" id="details" class="d-none">
+    </div>
+    <div id="details-card" class="d-none">
+        <div id="card-header">
+        </div>
+        <div id="card-body">
+        </div>
+    </div>
+</body>
+
+</html>
