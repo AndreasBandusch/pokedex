@@ -345,3 +345,8 @@ function searchPokemons() {
     renderPokemonCards();
     filteredPokemons = [];
 }
+
+function restartApp() {
+    document.getElementById('search-value').value = '';
+    location.reload();
+}
