@@ -349,5 +349,4 @@ function searchPokemons() {
 function restartApp() {
     document.getElementById('search-value').value = '';
     location.reload();
-    console.log('Test');
 }
