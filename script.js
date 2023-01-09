@@ -48,6 +48,8 @@ async function loadMore() {
     }
     limit = offset + (loadingStep - 1);
     await loadPokemons();
+    filteredPokemons = [];
+    clearSearchField();
     renderPokemonCards();
 }
 
@@ -347,6 +349,10 @@ function searchPokemons() {
 }
 
 function restartApp() {
-    document.getElementById('search-value').value = '';
+    clearSearchField();
     location.reload();
+}
+
+function clearSearchField() {
+    document.getElementById('search-value').value = '';
 }
