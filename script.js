@@ -21,8 +21,24 @@ function toggleKeyListener(set) {
 
 
 function switchPokemonByKey(event) {
-    event.key === 'ArrowRight' ? switchPokemonCard(currentPokemon, 'right') :
-        switchPokemonCard(currentPokemon, 'left')
+    let pressedKey;
+    switch (event.key) {
+        case 'ArrowRight':
+            pressedKey = 'right';
+            break;
+        case 'ArrowUp':
+            pressedKey = 'right';
+            break;
+        case 'ArrowLeft':
+            pressedKey = 'left';
+            break;
+        case 'ArrowDown':
+            pressedKey = 'left';
+            break;
+        default: 
+            return false;
+    }
+    switchPokemonCard(currentPokemon, pressedKey);
 }
 
 
