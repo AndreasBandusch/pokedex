@@ -4,27 +4,25 @@ let noPokemonsFound = false;
 let swipePokemon;
 let offset = 1;
 let limit = 20;
+let currentPokemon = 0;
 const loadingStep = 20;
-
-
-window.addEventListener("resize", function () {
-    let links = document.getElementById('links');
-    let search = document.getElementById('search');
-    let container = document.getElementById('responsive-bg');
-    if (this.window.innerWidth > 750) {
-        links.style.display = "block";
-        search.style.display = "block";
-    } else {
-        links.style.display = "none";
-        search.style.display = "none";
-        container.style.display = 'none';
-    }
-})
 
 
 async function init() {
     await loadPokemons();
     renderPokemonCards();
+}
+
+
+function toggleKeyListener(set) {
+    set ? window.addEventListener("keydown", switchPokemonByKey) :
+        window.removeEventListener("keydown", switchPokemonByKey)
+}
+
+
+function switchPokemonByKey(event) {
+    event.key === 'ArrowRight' ? switchPokemonCard(currentPokemon, 'right') :
+        switchPokemonCard(currentPokemon, 'left')
 }
 
 
@@ -69,7 +67,7 @@ function renderPokemonCards() {
     let container = document.getElementById('card-container');
     container.innerHTML = '';
     let renderArray;
-    if (filteredPokemons.length > 0 ? renderArray = filteredPokemons :  renderArray = allLoadedPokemons);  
+    if (filteredPokemons.length > 0 ? renderArray = filteredPokemons : renderArray = allLoadedPokemons);
     if (!noPokemonsFound) {
         for (let i = 0; i < renderArray.length; i++) {
             let currentPokemon = renderArray[i];
@@ -152,11 +150,13 @@ function getCssStyle(currentPokemon) {
 
 
 function showDetailsCard(id, cssStyle) {
+    currentPokemon = id;
     document.getElementById('details').classList.remove('d-none');
     document.getElementById('details-card').classList.remove('d-none');
     document.getElementById('card-container').classList.add('make-transparent');
     document.getElementById('header').classList.add('make-transparent');
     document.getElementById('card-header').classList.add(cssStyle);
+    toggleKeyListener(true);
     renderDetailsCard(id);
 }
 
@@ -168,6 +168,7 @@ function closeDetailsCard() {
     document.getElementById('header').classList.remove('make-transparent');
     document.getElementById('details-card').classList.remove('d-flex');
     document.getElementById('card-header').removeAttribute('class');
+    toggleKeyListener(false);
 }
 
 
@@ -298,38 +299,6 @@ function formattingId(id) {
     } else {
         return `# ${id}`;
     }
-}
-
-
-function openResponsiveMenu() {
-    let links = document.getElementById('links');
-    let search = document.getElementById('search');
-    let container = document.getElementById('responsive-bg');
-    if (links.style.display === 'block') {
-        closeResposiveMenu(links, search, container);
-    } else {
-        showResponsiveMenu(links, search, container);
-    }
-}
-
-
-function closeResposiveMenu(links, search, container) {
-    links.classList.remove('links-responsive');
-    search.classList.remove('search-responsive');
-    container.classList.remove('responsive-bg');
-    links.style.display = 'none';
-    search.style.display = 'none';
-    container.style.display = 'none';
-}
-
-
-function showResponsiveMenu(links, search, container) {
-    container.classList.add('responsive-bg');
-    links.classList.add('links-responsive');
-    search.classList.add('search-responsive');
-    links.style.display = "block";
-    search.style.display = "block";
-    container.style.display = 'block';
 }
 
 
