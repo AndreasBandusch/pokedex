@@ -1,16 +1,63 @@
 let allLoadedPokemons = [];
 let filteredPokemons = [];
+let pokemonList = [];
 let noPokemonsFound = false;
 let swipePokemon;
 let offset = 1;
 let limit = 20;
 let currentPokemon = 0;
+let clicked = false;
 const loadingStep = 20;
+
+
+document.addEventListener("click", function (event) {
+    if (event.target.closest("#search-value")) {
+        return;
+    }
+    if (clicked) {
+        closeSearchMenu();
+    }
+});
 
 
 async function init() {
     await loadPokemons();
+    createPokemonList();
     renderPokemonCards();
+}
+
+
+async function loadPokemons() {
+    for (let i = offset; i <= limit; i++) {
+        let url = `https://pokeapi.co/api/v2/pokemon/${i}`;
+        let response = await fetch(url);
+        currentPokemon = await response.json();
+        allLoadedPokemons.push(currentPokemon);
+    }
+}
+
+
+function createPokemonList() {
+    pokemonList = [];
+    allLoadedPokemons.forEach(pokemon => {
+        pokemonList.push({ id: pokemon.id, name: pokemon.name })
+    });
+    sortPokemonList(pokemonList);
+}
+
+
+function sortPokemonList(toSortedArray) {
+    toSortedArray.sort((a, b) => {
+        const nameA = a.name.toUpperCase(); // Ignoriere Groß-/Kleinschreibung
+        const nameB = b.name.toUpperCase(); // Ignoriere Groß-/Kleinschreibung
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+        return 0; // Namen sind gleich, Reihenfolge bleibt unverändert
+    });
 }
 
 
@@ -35,20 +82,10 @@ function switchPokemonByKey(event) {
         case 'ArrowDown':
             pressedKey = 'left';
             break;
-        default: 
+        default:
             return false;
     }
     switchPokemonCard(currentPokemon, pressedKey);
-}
-
-
-async function loadPokemons() {
-    for (let i = offset; i <= limit; i++) {
-        let url = `https://pokeapi.co/api/v2/pokemon/${i}`;
-        let response = await fetch(url);
-        currentPokemon = await response.json();
-        allLoadedPokemons.push(currentPokemon);
-    }
 }
 
 
@@ -62,8 +99,10 @@ async function loadMore() {
     }
     limit = offset + (loadingStep - 1);
     await loadPokemons();
+    createPokemonList();
     filteredPokemons = [];
     clearSearchField();
+    closeSearchMenu();
     renderPokemonCards();
 }
 
@@ -85,19 +124,31 @@ function renderPokemonCards() {
     let renderArray;
     if (filteredPokemons.length > 0 ? renderArray = filteredPokemons : renderArray = allLoadedPokemons);
     if (!noPokemonsFound) {
-        for (let i = 0; i < renderArray.length; i++) {
-            let currentPokemon = renderArray[i];
-            let cssStyle = getCssStyle(currentPokemon);
-            container.innerHTML += renderPokemonCardsHtmlTop(i, cssStyle, currentPokemon);
-        }
-        container.innerHTML += renderPokemonCardsHtmlBottom();
+        renderCards(renderArray, container);
+    } else {
+        renderNoPokemonsFound(container);
     }
+}
+
+
+function renderCards(renderArray, renderContainer) {
+    for (let i = 0; i < renderArray.length; i++) {
+        let currentPokemon = renderArray[i];
+        let cssStyle = getCssStyle(currentPokemon);
+        renderContainer.innerHTML += renderPokemonCardsHtmlTop(i, cssStyle, currentPokemon);
+        renderContainer.innerHTML += renderPokemonCardsHtmlBottom();
+    }
+}
+
+
+function renderNoPokemonsFound(renderContainer) {
+    renderContainer.innerHTML = '<p class="no-found">No Pokemons found with this search!</p>'
 }
 
 
 function renderPokemonCardsHtmlTop(i, cssStyle, currentPokemon) {
     return /*html*/ `
-    <div onclick="showDetailsCard(${i}, '${cssStyle}')" class="card ${cssStyle}">
+    <div onclick="showDetailsCard(${currentPokemon['id'] - 1}, '${cssStyle}')" class="card ${cssStyle}">
         <span>${formattingId(currentPokemon['id'])}</span>
         <h2>${currentPokemon['name']}</h2>
         <div class="type-cont">
@@ -122,7 +173,6 @@ function getTypes(currentPokemon) {
     let types = '';
     for (let i = 0; i < currentPokemon['types'].length; i++) {
         types += /*html*/ `<span class="type">${currentPokemon['types'][i]['type']['name']}</span>`;
-
     }
     return types;
 }
@@ -166,6 +216,8 @@ function getCssStyle(currentPokemon) {
 
 
 function showDetailsCard(id, cssStyle) {
+    closeSearchMenu();
+    toggleBodyScrolling(true);
     currentPokemon = id;
     document.getElementById('details').classList.remove('d-none');
     document.getElementById('details-card').classList.remove('d-none');
@@ -177,7 +229,17 @@ function showDetailsCard(id, cssStyle) {
 }
 
 
+function toggleBodyScrolling(on) {
+    if (on) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = 'auto';
+    }
+}
+
+
 function closeDetailsCard() {
+    toggleBodyScrolling(false);
     document.getElementById('details').classList.add('d-none');
     document.getElementById('details-card').classList.add('d-none');
     document.getElementById('card-container').classList.remove('make-transparent');
@@ -329,15 +391,64 @@ function searchPokemons() {
     if (filteredPokemons.length < 1) {
         noPokemonsFound = true;
     }
+    renderPokemonList();
     renderPokemonCards();
     filteredPokemons = [];
 }
+
 
 function restartApp() {
     clearSearchField();
     location.reload();
 }
 
+
 function clearSearchField() {
     document.getElementById('search-value').value = '';
+}
+
+
+function openSearchMenu() {
+    document.getElementById('search-menu').style.display = 'flex';
+    renderPokemonList();
+    setTimeout(() => {
+        clicked = true;
+    }, 225)
+}
+
+
+function closeSearchMenu() {
+    document.getElementById('search-menu').style.display = 'none';
+    clicked = false;
+}
+
+
+function renderPokemonList() {
+    let searchField = document.getElementById('search-value').value;
+    let searchArray =  selectSearchArray(searchField);
+    let content = document.getElementById('result');
+    content.innerHTML = '';
+    if (filteredPokemons === 1) {
+        closeSearchMenu();
+    }
+    sortPokemonList(searchArray);
+    searchArray.forEach(pokemon => {
+        content.innerHTML += `<li class="item" onclick="setSearchValue('${pokemon.name}')">${pokemon.name}</li>`;
+    })
+}
+
+
+function selectSearchArray(searchField) {
+    if (!searchField.length || (filteredPokemons.length < 0)) {
+         return searchArray = pokemonList;
+    } else {
+        return searchArray = filteredPokemons;
+    }
+}
+
+
+function setSearchValue(searchValue) {
+    document.getElementById('search-value').value = searchValue;
+    closeSearchMenu();
+    searchPokemons();
 }
