@@ -28,7 +28,7 @@ A browsable Pokédex: search, filter and view detailed stats for Pokémon, sourc
 | HTML5 / CSS3 | Layout, type-based color theming |
 | [PokéAPI](https://pokeapi.co/) | REST, consumed directly via `fetch()`, no API key needed |
 
-No `package.json`, no bundler, no build step — a plain static site, consistent with [[El Pollo Loco]] from the same bootcamp period.
+No `package.json`, no bundler, no build step — a plain static site, consistent with El Pollo Loco from the same bootcamp period.
 
 ---
 
@@ -74,7 +74,7 @@ pokedex/
 
 ## Status
 
-Completed bootcamp project from the Developer Akademie, not under further active development. Was project four on [[Portfolio-Seite]] until 08.09.2026, when it was swapped out for the portfolio site itself (see that note's "Portfolio-Seite als fünftes Projekt" section) — the repo stays public on GitHub, just no longer linked from bandusch.com. `robots.txt`/`.htaccess` already set the site to `noindex, nofollow` on its own subdomain, independent of that swap.
+Completed bootcamp project from the Developer Akademie, not under further active development. Was project four on [bandusch.com](https://www.bandusch.com) until 08.09.2026, when it was swapped out for the portfolio site itself — the repo stays public on GitHub, just no longer linked from the portfolio. `robots.txt`/`.htaccess` already set the site to `noindex, nofollow` on its own subdomain, independent of that swap.
 
 One housekeeping note: the repo also contains an `out/` folder with generated JSDoc HTML output referencing an unrelated `test.js` — leftover from a documentation-generator run, not part of the actual app. Left untouched here since removing it wasn't part of this pass.
 
